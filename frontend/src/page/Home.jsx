@@ -23,18 +23,17 @@ export default function Home() {
         setLoading(false);
       }
     };
-
     if (user) {
       loadNotes();
     } else {
-      setLoading(false); // fix: don't stay stuck on "Loading notes..."
+      setLoading(false);
     }
   }, [user]);
 
   const addNoteHandler = async (note) => {
     try {
       const newNote = await createNote(note);
-      setNotes((prev) => [newNote, ...prev]); // fix: functional updater to avoid stale closure
+      setNotes((prev) => [newNote, ...prev]);
     } catch (err) {
       console.error(err);
       alert("Failed to add note");
@@ -56,18 +55,65 @@ export default function Home() {
     navigate("/");
   };
 
-  if (!user) return <p>Loading...</p>;
-  if (loading) return <p>Loading notes...</p>;
+  if (!user)
+    return (
+      <div className="splash-screen">
+        <div className="splash-orb" />
+        <p className="splash-text">Loading...</p>
+      </div>
+    );
+
+  if (loading)
+    return (
+      <div className="splash-screen">
+        <div className="splash-orb" />
+        <p className="splash-text">Fetching your notes...</p>
+      </div>
+    );
 
   return (
-    <div>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>{user.name}'s Notes</h1>
-        <button onClick={handleLogout}>Logout</button>
+    <div className="home-wrapper">
+      {/* Background mesh */}
+      <div className="bg-mesh" />
+      <div className="bg-orb bg-orb--1" />
+      <div className="bg-orb bg-orb--2" />
+
+      <header className="topbar">
+        <div className="topbar__brand">
+          <span className="topbar__logo">✦</span>
+          <span className="topbar__title">Inkwell</span>
+        </div>
+        <div className="topbar__right">
+          <span className="topbar__username">{user.name}</span>
+          <button className="btn-logout" onClick={handleLogout}>
+            Sign out
+          </button>
+        </div>
       </header>
 
-      <NoteForm addNote={addNoteHandler} />
-      <NoteList notes={notes} deleteNote={deleteNoteHandler} />
+      <main className="home-main">
+        <section className="hero-section">
+          <h1 className="hero-heading">
+            Your <em>thoughts</em>,<br /> crystallized.
+          </h1>
+          <p className="hero-sub">
+            {notes.length} {notes.length === 1 ? "note" : "notes"} stored
+          </p>
+        </section>
+
+        <div className="content-grid">
+          <aside className="sidebar">
+            <div className="sidebar__card">
+              <p className="sidebar__label">New Note</p>
+              <NoteForm addNote={addNoteHandler} />
+            </div>
+          </aside>
+
+          <section className="notes-section">
+            <NoteList notes={notes} deleteNote={deleteNoteHandler} />
+          </section>
+        </div>
+      </main>
     </div>
   );
 }
