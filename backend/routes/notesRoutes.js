@@ -1,23 +1,28 @@
 import express from "express";
 import Notes from "../models/notesModel.js";
 import auth from "../middlwares/authMiddleware.js";
+import { noteSchema } from "../../utils/validation.js";
 const router=express.Router();
 
 
 router.post('/',auth,async(req,res)=>{
-    try{
 
-          const {title,content,user}=req.body;
+    try{
+    const result = noteSchema.safeParse(req.body);
+    if(!result.success){
+        return res.status(400).json({errors:result.error.errors});
+    }
+    
+
+
+          const {title,content}=result.data;
           const notes=await Notes.create({
             title,content,user:req.user.id,
           });
-          res.status(201).json(notes);
-    }catch(error){
-        res.status(400).json({
-    message:error.message,
-});
-
-    }
+            res.status(201).json(notes);
+        }catch(err){
+            res.status(500).json({error :"Server error"});
+        }
   
 
 
