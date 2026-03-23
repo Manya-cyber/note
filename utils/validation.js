@@ -4,7 +4,7 @@ const registerSchema=z.object({
     name:z.string().min(3,"Name mustt be at least 3 chars long"),
 
     email: z.string().email("Invalid email"),
-    passoword: z.string().min(6,"Password must be at least 6 chars")
+    password: z.string().min(6,"Password must be at least 6 chars")
 
 })
 
